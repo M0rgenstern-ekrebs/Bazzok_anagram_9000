@@ -7,6 +7,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import java.nio.file.*;
+import java.io.*;
+
 public class TrieGenerique<T extends NoeudTrie<T, E, P> & Serializable, E, P> {
 	private T racine;
 
@@ -76,10 +79,45 @@ public class TrieGenerique<T extends NoeudTrie<T, E, P> & Serializable, E, P> {
 			return (null);
 	}
 
-	// Sauvegarde
+	// old Sauvegarde
+	// public void sauvegarder(String fichier) throws IOException {
+	// try (ObjectOutputStream oos = new ObjectOutputStream(new
+	// FileOutputStream(fichier))) {
+	// oos.writeObject(this);
+	// }
+	// }
+
+	// sync() :
+	// Force réellement l’écriture physique
+	// Sinon le système peut garder en cache.
+	// ATOMIC_MOVE :
+	// Le système garantit :
+	// remplacement complet
+	// pas d’état intermédiaire
 	public void sauvegarder(String fichier) throws IOException {
-		try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(fichier))) {
+
+		Path original = Paths.get(fichier);
+		Path temp = Paths.get(fichier + ".tmp");
+
+		// 1 Écriture dans fichier temporaire
+		try (FileOutputStream fos = new FileOutputStream(temp.toFile());
+				ObjectOutputStream oos = new ObjectOutputStream(fos)) {
+
 			oos.writeObject(this);
+			oos.flush();
+
+			// 2 Force écriture disque
+			fos.getFD().sync();
+		}
+
+		// 3 crée une bakup avant remplcement
+		Files.copy(original, Paths.get(fichier + ".bak"), StandardCopyOption.REPLACE_EXISTING);
+
+		// 4 Remplacement atomique
+		try {
+			Files.move(temp, original, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+		} catch (AtomicMoveNotSupportedException e) {
+			Files.move(temp, original, StandardCopyOption.REPLACE_EXISTING);
 		}
 	}
 
