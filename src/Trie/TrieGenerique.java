@@ -10,7 +10,8 @@ import java.io.Serializable;
 import java.nio.file.*;
 import java.io.*;
 
-public class TrieGenerique<T extends NoeudTrie<T, E, P> & Serializable, E, P> {
+public class TrieGenerique<T extends NoeudTrie<T, E, P> & Serializable, E, P>
+{
 	private T racine;
 
 	public TrieGenerique(T racine) {

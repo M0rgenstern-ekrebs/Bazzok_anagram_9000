@@ -1,15 +1,19 @@
 package models;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import Trie.TrieGenerique;
 
 public class GestionnaireDictionnaire {
 	private TrieGenerique<NoeudDico, Character, String> trie;
-	private static final String FICHIER_SAUVEGARDE = ".trie.dat";
+	private final String FICHIER_SAUVEGARDE;
 
-	public GestionnaireDictionnaire() {
+	public GestionnaireDictionnaire(String nom)
+	{
+		FICHIER_SAUVEGARDE = "Trie_"+nom+".dat";
 		try {
 			System.out.println("Chargement Dictionnaire existant...");
 			trie = charger();
@@ -23,6 +27,29 @@ public class GestionnaireDictionnaire {
 			System.out.println("Dictionnaire créé et sauvegardé !");
 		}
 	}
+
+	private void ApprendreDico(String chemin)
+	{
+		try (BufferedReader br = new BufferedReader(new FileReader(chemin))) {
+			String mot;
+			while ((mot = br.readLine()) != null) {
+				mot = mot.trim();
+				if (!mot.isEmpty() && mot.length() > 2) {
+					trie.ajouteMot(mot, null);
+				}
+			}
+			System.out.println(" " + chemin + " chargé !");
+		} catch (IOException e) {
+			System.err.println("Dico absent : " + e.getMessage());
+		}
+	}
+
+	public GestionnaireDictionnaire(String nom, String chemin) 
+	{
+		FICHIER_SAUVEGARDE = "Trie_"+nom+".dat";
+		ApprendreDico(chemin);
+	}
+
 
 	private TrieGenerique<NoeudDico, Character, String> charger() throws IOException, ClassNotFoundException {
 		return TrieGenerique.charger(FICHIER_SAUVEGARDE);

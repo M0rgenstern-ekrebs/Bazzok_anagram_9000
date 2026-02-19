@@ -17,6 +17,12 @@ public class NoeudDico implements NoeudTrie<NoeudDico, Character, String>, Seria
         payload = "";
         enfants = new HashMap<>();
     }
+
+    public NoeudDico()
+    {
+
+    }
+
     // Récupère l'enfant pour un caractère donné
     // null sinon
     public NoeudDico getEnfant(Character etiquette)
@@ -53,9 +59,8 @@ public class NoeudDico implements NoeudTrie<NoeudDico, Character, String>, Seria
         payload = data;
     }
 
-    // 🔥 FACTORY STATIQUE PAR DÉFAUT
     public NoeudDico creerNoeud()
     {
-        throw new UnsupportedOperationException("L'implémentation doit définir NoeudTrie.creerNoeud() !");
+        return (new NoeudDico());
     }
 }

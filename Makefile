@@ -21,7 +21,6 @@
 #                                               \▓▓    ▓▓
 #                                                \▓▓▓▓▓▓ 
                                                   
-
 MAIN = Main
 OUT_DIR = out
 
@@ -32,7 +31,6 @@ CLASSES := $(patsubst src/%.java,$(OUT_DIR)/%.class,$(SOURCES))
 
 # compilation
 JAVAC_FLAGS	= -Xlint:all -Werror $(JPPROJECT_FLAGS)
-JAVA_FLAGS 	= --enable-native-access=ALL-UNNAMED
 # Classpath for java (Linux/Mac)   # CP = $(OUT_DIR);$(LIBS) | tr '\n' ':'# Uncomment for Windows
 CP = $(OUT_DIR):$(LIBS) 
 
@@ -45,7 +43,7 @@ $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
 
 # Convert src/Path/File.java → out/Path/File.class
-$(OUT_DIR)/%.class: src/%.java | $(OUT_DIR) $(JLINE_JAR) $(LIB_EK_JAR)
+$(OUT_DIR)/%.class: src/%.java | $(OUT_DIR) $(JLINE_JAR) $(LIB_EK_JAR) $(RESSOURCE_DICTIONNAIRE_FR) $(RESSOURCE_DICTIONNAIRE_EN)
 	@$(call print_info,"Compiling $< ...")
 	@mkdir -p $(dir $@)         # Ensure the directory exists
 	javac $(JAVAC_FLAGS) -cp "$(CP)" -d $(OUT_DIR) $<
@@ -53,6 +51,7 @@ $(OUT_DIR)/%.class: src/%.java | $(OUT_DIR) $(JLINE_JAR) $(LIB_EK_JAR)
 clean:
 	@$(call print_info,"Cleaning build directory...")
 	rm -rf $(OUT_DIR)
+	rm -rf $(DIAGRAMS_DIR)
 
 re: clean all
 
@@ -142,6 +141,30 @@ $(LIB_EK_JAR): | $(EXTERNAL_EK_LIB_DIR)
 
 .PHONY: liblist
 
+RESSOURCE_DIR = resources
+RESSOURCE_DICTIONNAIRES_DIR = $(RESSOURCE_DIR)/dico
+RESSOURCE_DICTIONNAIRE_FR = $(RESSOURCE_DICTIONNAIRES_DIR)/francais.dic
+RESSOURCE_DICTIONNAIRE_EN = $(RESSOURCE_DICTIONNAIRES_DIR)/english.dic
+
+ressources: $(RESSOURCE_DICTIONNAIRE_FR) $(RESSOURCE_DICTIONNAIRE_EN)
+
+$(RESSOURCE_DICTIONNAIRES_DIR):
+	@$(call print_info,"creating $(RESSOURCE_DICTIONNAIRES_DIR)/")
+	mkdir -p $(RESSOURCE_DICTIONNAIRES_DIR)
+
+$(RESSOURCE_DICTIONNAIRE_FR): | $(RESSOURCE_DICTIONNAIRES_DIR)
+	@$(call print_info,"getting dictonnaire fr_FR")
+	sudo apt update && sudo apt install -y hunspell-fr && \
+	cp /usr/share/hunspell/fr_FR.dic $(RESSOURCE_DICTIONNAIRE_FR)
+
+$(RESSOURCE_DICTIONNAIRE_EN): | $(RESSOURCE_DICTIONNAIRES_DIR)
+	@$(call print_info,"getting dictonnaire en_US")
+	sudo apt update && sudo apt install -y hunspell-en-us && \
+	cp /usr/share/hunspell/en_US.dic $(RESSOURCE_DICTIONNAIRE_EN)
+
+.PHONY: ressources ressources_printer
+
+
 #             __     __ __          
 #            |  \   |  \  \         
 #  __    __ _| ▓▓_   \▓▓ ▓▓ _______ 
@@ -153,8 +176,23 @@ $(LIB_EK_JAR): | $(EXTERNAL_EK_LIB_DIR)
 #   \▓▓▓▓▓▓    \▓▓▓▓ \▓▓\▓▓\▓▓▓▓▓▓▓ 
 #                                   
                                   
-                                  
+# uml
 
+#  █ █ █▄ ▄█ █  
+#  █▄█ █ ▀ █ █▄▄
+
+UMLGRAPH_JAR = ~/tools/UmlGraph.jar
+DIAGRAMS_DIR = diagrams/
+
+uml:
+	mkdir -p $(DIAGRAMS_DIR)
+	javadoc -doclet org.umlgraph.doclet.UmlGraphDoc \
+	  -docletpath $(UMLGRAPH_JAR) \
+	  -private -all \
+	  -d $(DIAGRAMS_DIR) \
+	  src/**/*.java
+
+.PHONY: uml
 
 #  ▄▀▀ ▄▀▄ █   ▄▀▄ █▀▄ █▀
 #  ▀▄▄ ▀▄▀ █▄▄ ▀▄▀ █▀▄ ▄█

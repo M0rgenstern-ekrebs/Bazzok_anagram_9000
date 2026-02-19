@@ -19,7 +19,7 @@ public interface NoeudTrie<T, E, P> {
     P getData();
     void setData(P data);
 
-    // 🔥 FACTORY STATIQUE PAR DÉFAUT
+    // PAR DÉFAUT
     default T creerNoeud()
     {
         throw new UnsupportedOperationException("L'implémentation doit définir NoeudTrie.creerNoeud() !");

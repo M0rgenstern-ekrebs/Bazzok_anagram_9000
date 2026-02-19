@@ -4,11 +4,13 @@ import java.io.IOException;
 
 import Trie.TrieGenerique;
 
-public class Main {
-	public static void main(String[] args) {
+public class Main
+{
+	public static void main(String[] args)
+	{
 		GestionnaireDictionnaire dico = new GestionnaireDictionnaire();
 
-		// Dès la 2ème exécution → INSTANTANÉ !
+		// Dès la 2ème exécution -> INSTANTANÉ !
 		System.out.println(dico.checkMot("chat") != null); // true (0.0001s)
 
 		// Ajoute quelques mots
