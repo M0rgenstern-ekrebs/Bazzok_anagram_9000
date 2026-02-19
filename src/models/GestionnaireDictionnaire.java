@@ -8,7 +8,7 @@ import java.io.IOException;
 import Trie.TrieGenerique;
 
 public class GestionnaireDictionnaire {
-	private TrieGenerique<NoeudDico, Character, String> trie;
+	private TrieGenerique<NoeudDico, Character, String> dico;
 	private final String FICHIER_SAUVEGARDE;
 
 	public GestionnaireDictionnaire(String nom)
@@ -16,11 +16,11 @@ public class GestionnaireDictionnaire {
 		FICHIER_SAUVEGARDE = "Trie_"+nom+".dat";
 		try {
 			System.out.println("Chargement Dictionnaire existant...");
-			trie = charger();
+			dico = charger();
 			System.out.println("Dictionnaire chargé !");
 		} catch (Exception e) {
-			System.out.println("Chargement impossible, création de nouveau trie...");
-			trie = new TrieGenerique<>(new NoeudDico());
+			System.out.println("Chargement impossible, création de nouveau dico...");
+			dico = new TrieGenerique<>(new NoeudDico());
 			chargerHunspell();
 			System.out.println("Nouveau Dictionnaire créé");
 			sauvegarder();
@@ -35,7 +35,7 @@ public class GestionnaireDictionnaire {
 			while ((mot = br.readLine()) != null) {
 				mot = mot.trim();
 				if (!mot.isEmpty() && mot.length() > 2) {
-					trie.ajouteMot(mot, null);
+					dico.ajouteMot(mot, null);
 				}
 			}
 			System.out.println(" " + chemin + " chargé !");
@@ -57,7 +57,7 @@ public class GestionnaireDictionnaire {
 
 	private void sauvegarder() {
 		try {
-			trie.sauvegarder(FICHIER_SAUVEGARDE);
+			dico.sauvegarder(FICHIER_SAUVEGARDE);
 		} catch (IOException e) {
 			System.err.println("Erreur sauvegarde : " + e.getMessage());
 		}
@@ -69,11 +69,11 @@ public class GestionnaireDictionnaire {
 	}
 
 	public String checkMot(String mot) {
-		return (trie.checkMot(mot));
+		return (dico.checkMot(mot));
 	}
 
 	public void ajouteMot(String mot, String definition) {
-		trie.ajouteMot(mot, definition);
+		dico.ajouteMot(mot, definition);
 	}
 
 	public void fermer() {
