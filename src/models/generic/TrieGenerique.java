@@ -1,4 +1,4 @@
-package Trie;
+package models.generic;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,14 +8,19 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import java.nio.file.*;
+import java.util.function.Supplier;
+
+import interfaces.NoeudTrie;
+
 import java.io.*;
 
-public class TrieGenerique<T extends NoeudTrie<T, E, P> & Serializable, E, P>
-{
-	private T racine;
+public class TrieGenerique<T extends NoeudTrie<T, E, P> & Serializable, E, P> {
+	private final Supplier<T> constructeur;
+	private final T racine;
 
-	public TrieGenerique(T racine) {
-		this.racine = racine;
+	public TrieGenerique(Supplier<T> constructeur) {
+		this.constructeur = constructeur;
+		this.racine = constructeur.get();
 	}
 
 	@SuppressWarnings("unchecked") // le cast est 'unchecked' car le type est générique

@@ -1,35 +1,35 @@
-package models;
+package models.generic;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 
-import Trie.TrieGenerique;
+import models.NoeudDico;
 
 public class GestionnaireDictionnaire {
 	private TrieGenerique<NoeudDico, Character, String> dico;
+	private final String CHEMIN_RESSOURCE_DICO;
 	private final String FICHIER_SAUVEGARDE;
 
-	public GestionnaireDictionnaire(String nom)
-	{
-		FICHIER_SAUVEGARDE = "Trie_"+nom+".dat";
+	public GestionnaireDictionnaire(String nom, String chemin_ressource_dico) {
+		CHEMIN_RESSOURCE_DICO = chemin_ressource_dico;
+		FICHIER_SAUVEGARDE = "Trie_" + nom + ".dat";
 		try {
 			System.out.println("Chargement Dictionnaire existant...");
-			dico = charger();
+			dico = charger_serialisation();
 			System.out.println("Dictionnaire chargé !");
 		} catch (Exception e) {
 			System.out.println("Chargement impossible, création de nouveau dico...");
-			dico = new TrieGenerique<>(new NoeudDico());
-			chargerHunspell();
+			dico = new TrieGenerique<>(NoeudDico::new);
+			ApprendreDico(CHEMIN_RESSOURCE_DICO);
 			System.out.println("Nouveau Dictionnaire créé");
-			sauvegarder();
+			sauvegarder_serialisation();
 			System.out.println("Dictionnaire créé et sauvegardé !");
 		}
 	}
 
-	private void ApprendreDico(String chemin)
-	{
+	private void ApprendreDico(String chemin) {
 		try (BufferedReader br = new BufferedReader(new FileReader(chemin))) {
 			String mot;
 			while ((mot = br.readLine()) != null) {
@@ -44,28 +44,16 @@ public class GestionnaireDictionnaire {
 		}
 	}
 
-	public GestionnaireDictionnaire(String nom, String chemin) 
-	{
-		FICHIER_SAUVEGARDE = "Trie_"+nom+".dat";
-		ApprendreDico(chemin);
-	}
-
-
-	private TrieGenerique<NoeudDico, Character, String> charger() throws IOException, ClassNotFoundException {
+	private TrieGenerique<NoeudDico, Character, String> charger_serialisation() throws IOException, ClassNotFoundException {
 		return TrieGenerique.charger(FICHIER_SAUVEGARDE);
 	}
 
-	private void sauvegarder() {
+	private void sauvegarder_serialisation() {
 		try {
 			dico.sauvegarder(FICHIER_SAUVEGARDE);
 		} catch (IOException e) {
 			System.err.println("Erreur sauvegarde : " + e.getMessage());
 		}
-	}
-
-	private void chargerHunspell() {
-		// Ton code de chargement Hunspell
-		// ~2 secondes pour 100k mots
 	}
 
 	public String checkMot(String mot) {
@@ -77,6 +65,6 @@ public class GestionnaireDictionnaire {
 	}
 
 	public void fermer() {
-		sauvegarder(); // Sauvegarde auto à la fermeture
+		sauvegarder_serialisation(); // Sauvegarde auto à la fermeture
 	}
 }
